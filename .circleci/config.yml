@@ -31,6 +31,7 @@ jobs:
                       ssh -oStrictHostKeyChecking=no -v $SSH_USER@$SSH_HOST 'cd ~/express-example && git checkout develop && git pull && chmod 777 ./script/deploy.sh && ./script/deploy.sh'
 
 workflows:
+    version: 1
     build-and-deploy:
         jobs:
             - build

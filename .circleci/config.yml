@@ -1,0 +1,25 @@
+version: 2.1
+
+orbs:
+    node: circleci/node@5.0.1
+
+jobs:
+    go-to-work:
+        docker:
+            - image: cimg/base:stable
+        steps:
+            - checkout
+            - run:
+                  name: 'Wake up'
+                  command: 'echo Wake up'
+            - run:
+                  name: 'Have breakfast'
+                  command: 'echo Have breakfast'
+            - run:
+                  name: 'Go to work'
+                  command: 'echo Go to work'
+
+workflows:
+    go-to-work-workflow:
+        jobs:
+            - go-to-work

@@ -1,10 +1,8 @@
-# version of the circleCI used
 version: 2.1
 
-# command lines that circleCI provides
 orbs:
     node: circleci/node@5.0.1
-# Define a job to be invoked later in a workflow.
+
 jobs:
     go-to-work:
         docker:
@@ -22,6 +20,6 @@ jobs:
                   command: 'echo Go to work'
 
 workflows:
-    say-hello-workflow:
+    go-to-work-workflow:
         jobs:
-            - say-hello
+            - go-to-work

@@ -4,22 +4,40 @@ orbs:
     node: circleci/node@5.0.1
 
 jobs:
-    go-to-work:
+    build:
+        working_directory: ~/express-example
         docker:
-            - image: cimg/base:stable
+            - image: circleci/node:14
+            - image: docker:19.03.14
+
         steps:
             - checkout
+            - setup_remote_docker
+            - run: npm cache clear --force
             - run:
-                  name: 'Wake up'
-                  command: 'echo Wake up'
+                  name: Update NPM version
+                  command: 'sudo npm install -g npm@latest'
+    deploy:
+        machine:
+            enabled: true
+        working_directory: ~/express-example
+        steps:
+            - add_ssh_keys:
+                  fingerprints: '55:b9:a6:73:af:2f:30:b5:96:34:fb:47:29:ac:da:d8'
             - run:
-                  name: 'Have breakfast'
-                  command: 'echo Have breakfast'
-            - run:
-                  name: 'Go to work'
-                  command: 'echo Go to work'
+                  name: Deploy via ssh
+                  command: |
+                      echo Starting deploy to server
+                      ssh -oStrictHostKeyChecking=no -v $SSH_USER@$SSH_HOST 'cd ~/express-example && git checkout develop && git pull && chmod 777 ./script/deploy.sh && ./script/deploy.sh'
 
 workflows:
-    go-to-work-workflow:
+    build-and-deploy:
         jobs:
-            - go-to-work
+            - build
+            - deploy:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only:
+                              - main

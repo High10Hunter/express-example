@@ -37,6 +37,7 @@ jobs:
     deploy:
         # machine:
         #     enabled: true
+        version: 3
         executor: docker/docker
         working_directory: ~/express-example
         steps:

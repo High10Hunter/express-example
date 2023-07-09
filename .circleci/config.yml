@@ -2,14 +2,18 @@ version: 2.1
 
 orbs:
     node: circleci/node@5.0.1
+    docker: circleci/docker@2.2.0
 
 jobs:
     build:
+        environment:
+            DOCKER_IMAGE: high10hunter/node
+            DOCKER_TAGS: latest
         working_directory: ~/express-example
         docker:
             - image: circleci/node:14
             - image: docker:19.03.14
-
+        executor: docker/docker
         steps:
             - checkout
             - setup_remote_docker
@@ -17,9 +21,23 @@ jobs:
             - run:
                   name: Update NPM version
                   command: 'sudo npm install -g npm@latest'
+        - docker/check:
+                docker-username: DOCKER_USERNAME
+                docker-password: DOCKER_PASSWORD
+        - docker/build:
+                image: $DOCKER_IMAGE
+                tag: $DOCKER_TAG
+        - docker/push:
+                digest-path: /tmp/digest.txt
+                image: $DOCKER_IMAGE
+                tag: $DOCKER_TAG
+        - run:
+            command: |
+                echo "Digest is: $(</tmp/digest.txt)"
     deploy:
-        machine:
-            enabled: true
+        # machine:
+        #     enabled: true
+        executor: docker/docker
         working_directory: ~/express-example
         steps:
             - add_ssh_keys:

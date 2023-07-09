@@ -17,6 +17,5 @@
 # using docker remote
 docker-compose stop     
 docker-compose rm -f
-docker image prune -f
 docker-compose pull
 docker-compose up -d --build

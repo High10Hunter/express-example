@@ -8,7 +8,7 @@ jobs:
     build:
         environment:
             DOCKER_IMAGE: high10hunter/node
-            DOCKER_TAGS: latest
+            DOCKER_TAG: latest
         working_directory: ~/express-example
         docker:
             - image: circleci/node:14

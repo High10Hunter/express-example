@@ -15,7 +15,7 @@
 # docker run -p 3000:3000 --name express-example -d $DOCKER_IMAGE
 
 # using docker remote
-docker-compose stop     
-docker-compose rm -f
-docker-compose pull
-docker-compose up -d --build
+docker compose stop     
+docker compose rm -f
+docker compose pull
+docker compose up -d

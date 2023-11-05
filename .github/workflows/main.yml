@@ -19,3 +19,4 @@ jobs:
                     TOKEN=secret
                     echo "TOKEN=$TOKEN" >> $GITHUB_ENV
                     echo "::add-mask::$TOKEN"
+                run: echo THIS IS MY TOKEN $TOKEN

@@ -39,6 +39,7 @@ jobs:
                   key: ${{ secrets.EC2_KEY }}
                   port: ${{ secrets.PORT }}
                   script: |
+                      whoami
                       cd express-example
                       git pull
                       npm install

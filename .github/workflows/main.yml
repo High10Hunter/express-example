@@ -13,9 +13,10 @@ jobs:
     say-hello:
         runs-on: ubuntu-latest
         steps:
-            - uses: mheap/github-action-required-labels@v5
+            - if: github.event_name == 'pull_request'
+              uses: mheap/github-action-required-labels@v5
               with:
                   mode: exactly
-                  count: 0
+                  count: 1
                   labels: 'do not build'
             - run: echo "Hello world"

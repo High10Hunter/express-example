@@ -18,4 +18,4 @@ jobs:
                   mode: exactly
                   count: 0
                   labels: 'do not build'
-            - run: echo "Hello world! Today is $TODAY"
+            - run: echo "Hello world"

@@ -9,7 +9,6 @@ on:
         types: [opened, synchronize, labeled, unlabeled]
         branches:
             - 'main'
-
 jobs:
     say-hello:
         runs-on: ubuntu-latest

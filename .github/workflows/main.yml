@@ -17,5 +17,5 @@ jobs:
               with:
                   mode: exactly
                   count: 0
-                  labels: 'do not merge'
+                  labels: 'do not build'
             - run: echo "Hello world! Today is $TODAY"

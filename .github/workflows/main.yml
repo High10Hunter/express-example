@@ -1,10 +1,14 @@
 name: hello world
 on:
     push:
-        branches: [main]
+        paths:
+            - '**.js'
+
+        branches:
+            - 'main'
+            - 'develop'
 jobs:
     say-hello:
         runs-on: ubuntu-latest
         steps:
-            - run: echo "TODAY=${date +%y-%m-%d}" >> $GITHUB_ENV
             - run: echo "Hello world! Today is $TODAY"

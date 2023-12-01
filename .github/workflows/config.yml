@@ -46,4 +46,4 @@ jobs:
                       npm install
                       pm2 restart api
             - name: Notify deployment
-              run: echo "Deployment complete!"s
+              run: echo "Deployment complete!"

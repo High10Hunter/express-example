@@ -2,6 +2,8 @@ name: Test
 on:
     pull_request_review:
         types: [submitted]
+        branches:
+            - main
 jobs:
     test:
         if: ${{ github.event.review.state == 'approved' && github.pull_request.base.ref == 'main' }}
@@ -16,4 +18,4 @@ jobs:
                       -H "Content-Type: application/json" \
                       -H "Circle-Token: ${{ secrets.CIRCLECI_TOKEN }}" \
                       --data '{"branch": "develop", "parameters": {"task": "test"}}' \
-                      https://circleci.com/api/v2/project/gh/high10hunter/express-example/pipeline
+                      https://circleci.com/api/v2/project/gh/High10Hunter/express-example/pipeline

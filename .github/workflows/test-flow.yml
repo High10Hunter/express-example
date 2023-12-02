@@ -10,10 +10,10 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Trigger Test workflow on CircleCI
-            run: |
-                curl \
-                    -X POST \
-                    -H "Content-Type: application/json" \
-                    -H "Circle-Token: ${{ secrets.CIRCLECI_TOKEN }}" \
-                    --data '{"branch": "develop", "parameters": {"task": "test"}}' \
-                    https://circleci.com/api/v2/project/gh/high10hunter/express-example/pipeline
+              run: |
+                  curl \
+                      -X POST \
+                      -H "Content-Type: application/json" \
+                      -H "Circle-Token: ${{ secrets.CIRCLECI_TOKEN }}" \
+                      --data '{"branch": "develop", "parameters": {"task": "test"}}' \
+                      https://circleci.com/api/v2/project/gh/high10hunter/express-example/pipeline

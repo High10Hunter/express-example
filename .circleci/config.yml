@@ -1,56 +1,111 @@
 version: 2.1
 
-orbs:
-    node: circleci/node@5.0.1
-    docker: circleci/docker@2.2.0
+parameters:
+    task:
+        type: enum
+        enum: ['test', 'build', 'deploy']
+        default: 'build'
+    build_stage:
+        type: enum
+        enum: ['dev', 'prod']
+        default: 'dev'
+
+executors:
+    node:
+        docker:
+            - image: cimg/node:16.16.0
 
 jobs:
-    build:
-        environment:
-            DOCKER_IMAGE: high10hunter/node
-            DOCKER_TAG: latest
+    test:
+        machine: true
         working_directory: ~/express-example
-        docker:
-            - image: circleci/node:14
-            - image: docker:19.03.14
-        executor: docker/docker
         steps:
             - checkout
-            - setup_remote_docker
-            - run: npm cache clear --force
+            - restore_cache:
+                  name: Restore NPM cache
+                  keys:
+                      - npm-cache-{{ checksum "package-lock.json" }}
+            - run:
+                  name: Run tests
+                  command: npm run test
+
+    build:
+        machine: true
+        working_directory: ~/express-example
+        steps:
+            - checkout
+            - restore_cache:
+                  name: Restore NPM cache
+                  keys:
+                      - npm-cache-{{ checksum "package-lock.json" }}
+                      - npm-cache-
             - run:
                   name: Update NPM version
                   command: 'sudo npm install -g npm@latest'
-            - docker/check:
-                  docker-username: DOCKER_USERNAME
-                  docker-password: DOCKER_PASSWORD
-            - docker/build:
-                  image: $DOCKER_IMAGE
-                  tag: $DOCKER_TAG
-            - docker/push:
-                  digest-path: /tmp/digest.txt
-                  image: $DOCKER_IMAGE
-                  tag: $DOCKER_TAG
+
+            - save_cache:
+                  name: Save NPM cache
+                  key: npm-cache-{{ checksum "package-lock.json" }}
+                  paths:
+                      - ~/.cache/npm
+                      - ./node_modules
             - run:
-                  command: |
-                      echo "Digest is: $(</tmp/digest.txt)"
+                  name: Install dependencies
+                  command: npm install
+            - run:
+                  name: Run tests
+                  command: npm run test
+            - run:
+                  name: Build
+                  command: npm run build
+
     deploy:
-        # machine:
-        #     enabled: true
-        executor: docker/docker
+        executor: node
         working_directory: ~/express-example
         steps:
-            - add_ssh_keys:
-                  fingerprints: '55:b9:a6:73:af:2f:30:b5:96:34:fb:47:29:ac:da:d8'
-            - run:
-                  name: Deploy via ssh
-                  command: |
-                      echo Starting deploy to server
-                      ssh -oStrictHostKeyChecking=no -v $SSH_USER@$SSH_HOST 'cd ~/express-example && git checkout develop && git pull && chmod 777 ./script/deploy.sh && ./script/deploy.sh'
+            - checkout
+        - restore_cache:
+                name: Restore NPM cache
+                keys:
+                    - npm-cache-{{ checksum "package-lock.json" }}
+                    - npm-cache-
+        - run:
+            name: Install dependencies
+            command: npm ci
+        - save_cache:
+            name: Save NPM cache
+            key: npm-cache-{{ checksum "package-lock.json" }}
+            paths:
+                - ~/.cache/npm
+                - ./node_modules
+        - run:
+            name: 'Deploy to {{ parameters.build_stage }}'
+            command: |
+                curl -i -H "X-Hub-Signature: $GITHUB_SECRET" \
+                    -H "Content-Type: application/json" \
+                    -X POST $WEBHOOK_URL/test 
 
 workflows:
     version: 3
-    build-and-deploy:
+    Test:
+        when:
+            equal: ['test', '{{ parameters.task }}']   
+        jobs:
+            - test
+    Build:
+        when:
+            equal: ['build', '{{ parameters.task }}']   
+        jobs:
+            - build:
+                filters:
+                    branches:
+                        only: develop 
+
+    DeployDev:
+        when:
+            equal: ['deploy', '{{ parameters.task }}']  
+        when:
+            equal: ['dev', '{{ parameters.build_stage }}'] 
         jobs:
             - build
             - deploy:
@@ -58,5 +113,19 @@ workflows:
                       - build
                   filters:
                       branches:
-                          only:
-                              - main
+                          only: develop
+
+    DeployProd:
+        when:
+            equal: ['deploy', '{{ parameters.task }}']  
+        when:
+            equal: ['prod', '{{ parameters.build_stage }}'] 
+        jobs:
+            - build
+            - deploy:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only: main
+

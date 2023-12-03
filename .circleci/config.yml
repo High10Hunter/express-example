@@ -79,7 +79,7 @@ jobs:
                       - ~/.cache/npm
                       - ./node_modules
             - run:
-                  name: 'Deploy to {{ parameters.build_stage }}'
+                  name: 'Deploy to << pipeline.parameters.build_stage >>'
                   command: |
                       curl -i -H "X-Hub-Signature: $GITHUB_SECRET" \
                           -H "Content-Type: application/json" \
@@ -89,12 +89,12 @@ workflows:
     version: 3
     Test:
         when:
-            equal: ['test', '{{ parameters.task }}']
+            equal: [test, << pipeline.parameters.task >>]
         jobs:
             - test
     Build:
         when:
-            equal: ['build', '{{ parameters.task }}']
+            equal: [build, << pipeline.parameters.task >>]
         jobs:
             - build:
                   filters:
@@ -104,8 +104,8 @@ workflows:
     DeployDev:
         when:
             and:
-                - equal: ['deploy', '{{ parameters.task }}']
-                - equal: ['dev', '{{ parameters.build_stage }}']
+                - equal: [deploy, << pipeline.parameters.task >>]
+                - equal: [dev, << pipeline.parameters.build_stage >>]
         jobs:
             - build
             - deploy:
@@ -119,8 +119,8 @@ workflows:
     DeployProd:
         when:
             and:
-                - equal: ['deploy', '{{ parameters.task }}']
-                - equal: ['prod', '{{ parameters.build_stage }}']
+                - equal: [deploy, << pipeline.parameters.task >>]
+                - equal: [prod, << pipeline.parameters.build_stage >>]
         jobs:
             - build
             - deploy:

@@ -1,0 +1,19 @@
+name: Test
+on:
+    pull_request:
+        types: [opened, synchronize]
+        branches: [main]
+jobs:
+    test:
+        if: ${{ github.event.review.state == 'approved' && github.event.pull_request.base.ref == 'main' }}
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Trigger Test workflow on CircleCI
+              run: |
+                  curl \
+                      -X POST \
+                      -H "Content-Type: application/json" \
+                      -H "Circle-Token: ${{ secrets.CIRCLECI_TOKEN }}" \
+                      --data '{"branch": "develop", "parameters": {"task": "test"}}' \
+                      https://circleci.com/api/v2/project/gh/High10Hunter/express-example/pipeline

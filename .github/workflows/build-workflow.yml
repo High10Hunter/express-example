@@ -1,29 +1,24 @@
-name: Test
+name: Build
 on:
     pull_request_review:
         types: [submitted]
+
 jobs:
     test:
-        if: ${{ github.event.review.state == 'approved' && github.event.pull_request.base.ref == 'main' }}
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            - name: Trigger Test workflow on CircleCI
-              run: |
-                  curl \
-                      -X POST \
-                      -H "Content-Type: application/json" \
-                      -H "Circle-Token: ${{ secrets.CIRCLECI_TOKEN }}" \
-                      --data '{"branch": "develop", "parameters": {"task": "test"}}' \
-                      https://circleci.com/api/v2/project/gh/High10Hunter/express-example/pipeline
+            - name: Install dependencies
+              run: npm ci
+            - name: Save NPM cache
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/npm
+                  key: npm-cache-${{ hashFiles('package-lock.json') }}
+                  restore-keys: npm-cache-
+            - name: Run tests
+              run: npm test
 
-name: Build
-on:
-    pull_request:
-        types: [opened, synchronize]
-        branches: [main]
-
-jobs:
     build:
         needs: test
         runs-on: ubuntu-latest

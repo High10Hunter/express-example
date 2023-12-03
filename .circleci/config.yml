@@ -47,10 +47,6 @@ jobs:
                   keys:
                       - npm-cache-{{ checksum "package-lock.json" }}
                       - npm-cache-
-            - run:
-                  name: Update NPM version
-                  command: npm install -g npm@latest
-
             - save_cache:
                   name: Save NPM cache
                   key: npm-cache-{{ checksum "package-lock.json" }}

@@ -36,9 +36,7 @@ jobs:
         environment:
             DOCKER_IMAGE: high10hunter/node
             DOCKER_TAG: latest
-        machine:
-            image: ubuntu-2004:202010-01
-            docker_layer_caching: true
+        machine: true
         working_directory: ~/express-example
         steps:
             - checkout

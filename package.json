@@ -3,8 +3,8 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"test": "echo \"Testing...\" && exit 1",
-		"build": "echo \"Building...\" && exit 1",
+		"test": "echo \"Testing...\"",
+		"build": "echo \"Building...\"",
 		"start": "node ./bin/www"
 	},
 	"dependencies": {

@@ -1,0 +1,62 @@
+version: 2.1
+
+orbs:
+    node: circleci/node@5.0.1
+    docker: circleci/docker@2.2.0
+
+jobs:
+    build:
+        environment:
+            DOCKER_IMAGE: high10hunter/node
+            DOCKER_TAG: latest
+        working_directory: ~/express-example
+        docker:
+            - image: circleci/node:14
+            - image: docker:19.03.14
+        executor: docker/docker
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run: npm cache clear --force
+            - run:
+                  name: Update NPM version
+                  command: 'sudo npm install -g npm@latest'
+            - docker/check:
+                  docker-username: DOCKER_USERNAME
+                  docker-password: DOCKER_PASSWORD
+            - docker/build:
+                  image: $DOCKER_IMAGE
+                  tag: $DOCKER_TAG
+            - docker/push:
+                  digest-path: /tmp/digest.txt
+                  image: $DOCKER_IMAGE
+                  tag: $DOCKER_TAG
+            - run:
+                  command: |
+                      echo "Digest is: $(</tmp/digest.txt)"
+    deploy:
+        # machine:
+        #     enabled: true
+        executor: docker/docker
+        working_directory: ~/express-example
+        steps:
+            - add_ssh_keys:
+                  fingerprints: '55:b9:a6:73:af:2f:30:b5:96:34:fb:47:29:ac:da:d8'
+            - run:
+                  name: Deploy via ssh
+                  command: |
+                      echo Starting deploy to server
+                      ssh -oStrictHostKeyChecking=no -v $SSH_USER@$SSH_HOST 'cd ~/express-example && git checkout develop && git pull && chmod 777 ./script/deploy.sh && ./script/deploy.sh'
+
+workflows:
+    version: 3
+    build-and-deploy:
+        jobs:
+            - build
+            - deploy:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only:
+                              - main

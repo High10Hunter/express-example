@@ -3,6 +3,9 @@ services:
     app:
         restart: on-failure
         container_name: express-example
+        build:
+            context: .
+            dockerfile: Dockerfile
         command: npm start
         image: high10hunter/node:latest
         ports:

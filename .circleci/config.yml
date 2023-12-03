@@ -83,7 +83,7 @@ jobs:
                   command: |
                       curl -i -H "X-Hub-Signature: $GITHUB_SECRET" \
                           -H "Content-Type: application/json" \
-                          -X POST $WEBHOOK_URL/test
+                          -X POST $WEBHOOK_URL/redeploy
 
 workflows:
     version: 3

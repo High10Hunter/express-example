@@ -3,6 +3,7 @@ services:
     app:
         restart: on-failure
         container_name: express-example
+        command: npm start
         image: high10hunter/node:latest
         ports:
             - '3000:3000'
